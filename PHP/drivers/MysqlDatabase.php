@@ -34,7 +34,7 @@ class MysqlDatabase extends database
         $query->execute();
         $result = $query->get_result();
         $data = [];
-        while($each = $result->fetch_object()){
+        while ($each = $result->fetch_object()) {
             $data[] = $each;
         }
         return $data;
@@ -43,18 +43,33 @@ class MysqlDatabase extends database
     public function whereAND($data)
     {
         $keyValues = [];
-        foreach($data as $key => $value){
-             $keyValues[] = $key.'=?';
+        foreach ($data as $key => $value) {
+            $keyValues[] = $key . '=?';
         }
-        $setFields = implode(' AND ',$keyValues);
+        $setFields = implode(' AND ', $keyValues);
         $sql = "SELECT * FROM $this->table where $setFields";
+        echo $sql;
         $values = array_values($data);
         $query = $this->connect->prepare($sql);
-        $query->bind_param(str_repeat('s',count($data)), ...$values);
+        $query->bind_param(str_repeat('s', count($data)), ...$values);
         $query->execute();
         $result = $query->get_result();
         $data = [];
-        while($each = $result->fetch_object()){
+        while ($each = $result->fetch_object()) {
+            $data[] = $each;
+        }
+        return $data;
+    }
+
+    public function whereEmail($email)
+    {
+        $sql = "select * from $this->table where email = ?";
+        $query = $this->connect->prepare($sql);
+        $query->bind_param('s', $email);
+        $query->execute();
+        $result = $query->get_result();
+        $data = [];
+        while ($each = $result->fetch_object()) {
             $data[] = $each;
         }
         return $data;
@@ -63,23 +78,23 @@ class MysqlDatabase extends database
     public function whereOR($data)
     {
         $keyValues = [];
-        foreach($data as $key => $value){
-             $keyValues[] = $key.'=?';
+        foreach ($data as $key => $value) {
+            $keyValues[] = $key . '=?';
         }
-        $setFields = implode(' OR ',$keyValues);
+        $setFields = implode(' OR ', $keyValues);
         $sql = "SELECT * FROM $this->table where $setFields";
         $values = array_values($data);
         $query = $this->connect->prepare($sql);
-        $query->bind_param(str_repeat('s',count($data)), ...$values);
+        $query->bind_param(str_repeat('s', count($data)), ...$values);
         $query->execute();
         $result = $query->get_result();
         $data = [];
-        while($each = $result->fetch_object()){
+        while ($each = $result->fetch_object()) {
             $data[] = $each;
         }
         return $data;
     }
-    
+
     // public function whereGreaterThan ($data){
     //     $keyValues = [];
     //     foreach($data as $key => $value){
@@ -103,13 +118,13 @@ class MysqlDatabase extends database
 
     public function getId($id)
     {
-        $sql ="select * from $this->table where id = ?";
+        $sql = "select * from $this->table where id = ?";
         $query = $this->connect->prepare($sql);
-        $query->bind_param('i',$id);
+        $query->bind_param('i', $id);
         $query->execute();
         $result = $query->get_result();
         $data = [];
-        while($each = $result->fetch_object()){
+        while ($each = $result->fetch_object()) {
             $data[] = $each;
         }
         return $data;
@@ -130,21 +145,21 @@ class MysqlDatabase extends database
     public function update($id, $data)
     {
         $keyValues = [];
-        foreach($data as $key => $value){
-             $keyValues[] = $key.'=?';
+        foreach ($data as $key => $value) {
+            $keyValues[] = $key . '=?';
         }
-        $setFields = implode(',',$keyValues);
+        $setFields = implode(',', $keyValues);
 
         $sql = "Update $this->table set $setFields where id = ?";
         $query = $this->connect->prepare($sql);
         //get values
         $values = array_values($data);
         $values[] = $id;
-        $query->bind_param(str_repeat("s",count($data)).'i', ...$values);
+        $query->bind_param(str_repeat("s", count($data)) . 'i', ...$values);
         $result = $query->execute();
         return $query->affected_rows;
     }
-    
+
     public function delete($id)
     {
         $sql = "delete from $this->table where id = ?";
