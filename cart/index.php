@@ -1,140 +1,168 @@
+<?php
+//index.php
+
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Sahil Kumar">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Shopping Cart System</title>
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css' />
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css' />
+    <title>PHP Shopping Cart with Stripe Payment Integration</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <style>
+    .popover {
+        width: 100%;
+        max-width: 800px;
+    }
+    </style>
 </head>
 
-
-
 <body>
-
-    <!-- Navbar start -->
-    <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-        <a class="navbar-brand" href="index.php"><i class="fas fa-mobile-alt"></i>&nbsp;&nbsp;Mobile Store</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="index.php"><i class="fas fa-mobile-alt mr-2"></i>Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-th-list mr-2"></i>Categories</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="checkout.php"><i class="fas fa-money-check-alt mr-2"></i>Checkout</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart"></i> <span id="cart-item" class="badge badge-danger"></span></a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <!-- Navbar end -->
-
-    <!-- Displaying Products Start -->
     <div class="container">
-        <div id="message"></div>
-        <div class="row mt-2 pb-3">
-            <?php
-            include './core/config.php';
-            include './core/database.php';
-            include './core/MysqlDatabase.php';
-            $db = new MysqlDatabase;
-            $products = $db->table('products')->get();
-            foreach ($products as $product) {
-
-            ?>
-                <div class="col-sm-6 col-md-4 col-lg-3 mb-2">
-                    <div class="card-deck">
-                        <div class="card p-2 border-secondary mb-2">
-                            <img src="<?php echo $product->image ?>" class="card-img-top" height="250">
-                            <div class="card-body p-1">
-                                <h4 class="card-title text-center text-info"><?php echo $product->name ?></h4>
-                                <h5 class="card-text text-center text-danger">Giá: <?php echo $product->price ?>
-                                </h5>
-
-                            </div>
-                            <div class="card-footer p-1">
-                                <form action="" class="form-submit">
-                                    <!-- <div class="row p-2">
-                                    <div class="col-md-6 py-1 pl-4">
-                                        <b>Quantity : </b>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="number" class="form-control pqty"
-                                            value="<?php echo $product->quantity ?>">
-                                    </div>
-                                </div> -->
-                                    <input type="hidden" class="id" value="<?php echo $product->id ?>">
-                                    <input type="hidden" class="name" value="<?php echo $product->name ?>">
-                                    <input type="hidden" class="price" value="<?php echo $product->price ?>">
-                                    <input type="hidden" class="image" value="<?php echo $product->image ?>">
-                                    <input type="hidden" class="code" value="<?php echo $product->code ?>">
-                                    <button class="btn btn-info btn-block addItemBtn"><i class="fas fa-cart-plus"></i>&nbsp;&nbsp;Add to
-                                        cart</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+        <br />
+        <h3 align="center"><a href="#">PHP Shopping Cart with Stripe Payment Integration</a></h3>
+        <br />
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target=".navbar-collapse">
+                        <span class="sr-only">Menu</span>
+                        <span class="glyphicon glyphicon-menu-hamburger"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">Webslesson</a>
                 </div>
-            <?php } ?>
+                <div id="navbar-cart" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a id="cart-popover" class="btn" data-placement="bottom" title="Shopping Cart">
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                <span class="badge"></span>
+                                <span class="total_price"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="popover_content_wrapper" style="display: none">
+            <span id="cart_details"></span>
+            <div align="right">
+                <a href="order_process.php" class="btn btn-primary" id="check_out_cart">
+                    <span class="glyphicon glyphicon-shopping-cart"></span> Check out
+                </a>
+                <a href="#" class="btn btn-default" id="clear_cart">
+                    <span class="glyphicon glyphicon-trash"></span> Clear
+                </a>
+            </div>
         </div>
+
+        <div id="display_item" class="row">
+
+        </div>
+
+
+        <br />
+        <br />
     </div>
-
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js'></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(".addItemBtn").click(function(e) {
-                e.preventDefault();
-                var $form = $(this).closest('.form-submit');
-                var id = $form.find(".id").val();
-                var name = $form.find(".name").val();
-                var price = $form.find(".price").val();
-                var image = $form.find(".image").val();
-                var code = $form.find(".code").val();
-                $.ajax({
-                    url: 'action.php',
-                    method: 'post',
-                    data: {
-                        id,
-                        name,
-                        price,
-                        image,
-                        code,
-                    },
-                    success: function(response) {
-                        $('#message').html(response);
-                        window.scrollTo(0, 0);
-                        load_cart_item_number();
-                    }
-                });
-            });
-            load_cart_item_number();
-
-            function load_cart_item_number() {
-                $.ajax({
-                    url: 'action.php',
-                    method: 'get',
-                    data: {
-                        cartItem: "cart_item"
-                    },
-                    success: function(response) {
-                        $("#cart-item").html(response);
-                    }
-                });
-            }
-        });
-    </script>
+    </div>
 </body>
 
 </html>
+
+<script>
+$(document).ready(function() {
+
+    load_product();
+
+    load_cart_data();
+
+    function load_product() {
+        $.ajax({
+            url: "fetch_item.php",
+            method: "POST",
+            success: function(data) {
+                $('#display_item').html(data);
+            }
+        })
+    }
+
+    function load_cart_data() {
+        $.ajax({
+            url: "fetch_cart.php",
+            method: "POST",
+            dataType: "json",
+            success: function(data) {
+                $('#cart_details').html(data.cart_details);
+                $('.total_price').text(data.total_price);
+                $('.badge').text(data.total_item);
+            }
+        })
+    }
+
+    $('#cart-popover').popover({
+        html: true,
+        container: 'body',
+        content: function() {
+            return $('#popover_content_wrapper').html();
+        }
+    });
+
+    $(document).on('click', '.add_to_cart', function() {
+        var product_id = $(this).attr('id');
+        var product_name = $('#name' + product_id + '').val();
+        var product_price = $('#price' + product_id + '').val();
+        var product_quantity = $('#quantity' + product_id).val();
+        var action = 'add';
+        $.ajax({
+            url: "action.php",
+            method: "POST",
+            data: {
+                product_id,
+                product_name,
+                product_price,
+                product_quantity,
+                action
+            },
+            success: function(data) {
+                load_cart_data();
+                alert("Item has been Added into Cart");
+            }
+        })
+    });
+
+    $(document).on('click', '.remove-cart', function() {
+        var product_id = $(this).attr('id');
+        var action = 'remove';
+        $.ajax({
+            url: "action.php",
+            method: "POST",
+            data: {
+                product_id,
+                action
+            },
+            success: function(data) {
+                load_cart_data();
+                $('#cart-popover').popover('hide');
+                console.log(data);
+            }
+        })
+    });
+
+    $(document).on('click', '#clear_cart', function() {
+        var action = 'remove-cart-all';
+        $.ajax({
+            url: "action.php",
+            method: "POST",
+            data: {
+                action
+            },
+            success: function(data) {
+                load_cart_data();
+            }
+        })
+    });
+});
+</script>
