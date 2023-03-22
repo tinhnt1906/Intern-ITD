@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <style>
-    .popover {
-        width: 100%;
-        max-width: 800px;
-    }
+        .popover {
+            width: 100%;
+            max-width: 800px;
+        }
     </style>
 </head>
 
@@ -26,8 +26,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target=".navbar-collapse">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
                         <span class="sr-only">Menu</span>
                         <span class="glyphicon glyphicon-menu-hamburger"></span>
                     </button>
@@ -73,96 +72,97 @@
 </html>
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
 
-    load_product();
+        load_product();
 
-    load_cart_data();
+        load_cart_data();
 
-    function load_product() {
-        $.ajax({
-            url: "fetch_item.php",
-            method: "POST",
-            success: function(data) {
-                $('#display_item').html(data);
-            }
-        })
-    }
-
-    function load_cart_data() {
-        $.ajax({
-            url: "fetch_cart.php",
-            method: "POST",
-            dataType: "json",
-            success: function(data) {
-                $('#cart_details').html(data.cart_details);
-                $('.total_price').text(data.total_price);
-                $('.badge').text(data.total_item);
-            }
-        })
-    }
-
-    $('#cart-popover').popover({
-        html: true,
-        container: 'body',
-        content: function() {
-            return $('#popover_content_wrapper').html();
+        function load_product() {
+            $.ajax({
+                url: "fetch_item.php",
+                method: "POST",
+                success: function(data) {
+                    $('#display_item').html(data);
+                }
+            })
         }
-    });
 
-    $(document).on('click', '.add_to_cart', function() {
-        var product_id = $(this).attr('id');
-        var product_name = $('#name' + product_id + '').val();
-        var product_price = $('#price' + product_id + '').val();
-        var product_quantity = $('#quantity' + product_id).val();
-        var action = 'add';
-        $.ajax({
-            url: "action.php",
-            method: "POST",
-            data: {
-                product_id,
-                product_name,
-                product_price,
-                product_quantity,
-                action
-            },
-            success: function(data) {
-                load_cart_data();
-                alert("Item has been Added into Cart");
-            }
-        })
-    });
+        function load_cart_data() {
+            $.ajax({
+                url: "fetch_cart.php",
+                method: "POST",
+                dataType: "json",
+                success: function(data) {
+                    $('#cart_details').html(data.cart_details);
+                    $('.total_price').text(data.total_price);
+                    $('.badge').text(data.total_item);
+                }
+            })
+        }
 
-    $(document).on('click', '.remove-cart', function() {
-        var product_id = $(this).attr('id');
-        var action = 'remove';
-        $.ajax({
-            url: "action.php",
-            method: "POST",
-            data: {
-                product_id,
-                action
-            },
-            success: function(data) {
-                load_cart_data();
-                $('#cart-popover').popover('hide');
-                console.log(data);
+        $('#cart-popover').popover({
+            html: true,
+            container: 'body',
+            content: function() {
+                return $('#popover_content_wrapper').html();
             }
-        })
-    });
+        });
 
-    $(document).on('click', '#clear_cart', function() {
-        var action = 'remove-cart-all';
-        $.ajax({
-            url: "action.php",
-            method: "POST",
-            data: {
-                action
-            },
-            success: function(data) {
-                load_cart_data();
-            }
-        })
+        $(document).on('click', '.add_to_cart', function() {
+            // alert('click');
+            var product_id = $(this).attr('id');
+            var product_name = $('#name' + product_id + '').val();
+            var product_price = $('#price' + product_id + '').val();
+            var product_quantity = $('#quantity' + product_id).val();
+            var action = 'add';
+            $.ajax({
+                url: "action.php",
+                method: "POST",
+                data: {
+                    product_id,
+                    product_name,
+                    product_price,
+                    product_quantity,
+                    action
+                },
+                success: function(data) {
+                    load_cart_data();
+                    alert("Item has been Added into Cart");
+                }
+            })
+        });
+
+        $(document).on('click', '.remove-cart', function() {
+            var product_id = $(this).attr('id');
+            var action = 'remove';
+            $.ajax({
+                url: "action.php",
+                method: "POST",
+                data: {
+                    product_id,
+                    action
+                },
+                success: function(data) {
+                    load_cart_data();
+                    $('#cart-popover').popover('hide');
+                    console.log(data);
+                }
+            })
+        });
+
+        $(document).on('click', '#clear_cart', function() {
+            var action = 'remove-cart-all';
+            $.ajax({
+                url: "action.php",
+                method: "POST",
+                data: {
+                    action
+                },
+                success: function(data) {
+                    load_cart_data();
+                }
+            })
+        });
     });
-});
 </script>

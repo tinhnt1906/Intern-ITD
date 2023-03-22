@@ -7,8 +7,6 @@ $db = new MysqlDatabase;
 session_start();
 
 if (isset($_POST["token"])) {
-
-
     \Stripe\Stripe::setApiKey('sk_test_51MmC4ZL4VsvdryfRnOr5xW9yQBBPaMjPadyBsBXn4qEUf5GpnCBiI8XCG7r2hCKkqmbdcw2NxbdI2WEkK5l07jqw00Lk6yboEG');
 
     $customer = \Stripe\Customer::create(array(

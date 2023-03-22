@@ -66,7 +66,6 @@ class MysqlDatabase extends database
         $query->execute();
         $result = $query->get_result();
         $rows = $result->num_rows;
-        echo $rows;
         return $rows;
     }
 
