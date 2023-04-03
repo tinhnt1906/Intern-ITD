@@ -40,7 +40,7 @@
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam veritatis minus et similique
                     doloribus? Harum molestias tenetur eaque illum quas? Obcaecati nulla in itaque modi magnam ipsa
                     molestiae ullam consequuntur.</p>
-                <a href="contact.php" class="btn">contact us</a>
+                <a href="#" class="btn">contact us</a>
             </div>
 
         </div>

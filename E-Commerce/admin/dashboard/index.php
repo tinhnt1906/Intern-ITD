@@ -8,7 +8,6 @@
     <meta name="description" content="au theme template">
     <meta name="author" content="Hau Nguyen">
     <meta name="keywords" content="au theme template">
-
     <!-- Title Page-->
     <title>Dashboard 2</title>
 
@@ -35,78 +34,92 @@
     <link href="../resources/css/theme.css" rel="stylesheet" media="all">
 
 </head>
+<?php
+session_start();
+include '../core/database.php';
+include '../core/config.php';
+include '../core/MysqlDatabase.php';
+$db = new MysqlDatabase;
+$users = $db->table('users')->count();
+$products = $db->table('products')->count();
+$orders = $db->table('orders')->count();
+?>
 
 <body class="animsition">
-    <div class="page-wrapper">
-        <?php include '../components/sidebar.php' ?>
-        <div class="page-container2">
-            <?php include '../components/header.php' ?>
-            <section class="au-breadcrumb m-t-75">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="au-breadcrumb-content">
-                                    <div class="au-breadcrumb-left">
-                                        <span class="au-breadcrumb-span">You are here:</span>
-                                        <ul class="list-unstyled list-inline au-breadcrumb__list">
-                                            <li class="list-inline-item active">
-                                                <a href="#">Home</a>
-                                            </li>
-                                            <li class="list-inline-item seprate">
-                                                <span>/</span>
-                                            </li>
-                                            <li class="list-inline-item">Dashboard</li>
-                                        </ul>
+    <?php
+    if (isset($_SESSION['user_email_admin']) && $_SESSION['user_role_admin'] == 'admin') {
+    ?>
+        <div class="page-wrapper">
+            <?php include '../components/sidebar.php' ?>
+            <div class="page-container2">
+                <?php include '../components/header.php' ?>
+                <section class="au-breadcrumb m-t-75">
+                    <div class="section__content section__content--p30">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="au-breadcrumb-content">
+                                        <div class="au-breadcrumb-left">
+                                            <span class="au-breadcrumb-span">You are here:</span>
+                                            <ul class="list-unstyled list-inline au-breadcrumb__list">
+                                                <li class="list-inline-item active">
+                                                    <a href="#">Home</a>
+                                                </li>
+                                                <li class="list-inline-item seprate">
+                                                    <span>/</span>
+                                                </li>
+                                                <li class="list-inline-item">Dashboard</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- STATISTIC-->
-            <section class="statistic">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-6 col-lg-3">
-                                <div class="statistic__item">
-                                    <h2 class="number">10,368</h2>
-                                    <span class="desc">members</span>
-                                    <div class="icon">
-                                        <i class="zmdi zmdi-account-o"></i>
+                <!-- STATISTIC-->
+                <section class="statistic">
+                    <div class="section__content section__content--p30">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="statistic__item">
+                                        <h2 class="number"><?= $users ?></h2>
+                                        <span class="desc">members</span>
+                                        <div class="icon">
+                                            <i class="zmdi zmdi-account-o"></i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="statistic__item">
-                                    <h2 class="number">388,688</h2>
-                                    <span class="desc">Product</span>
-                                    <div class="icon">
-                                        <i class="zmdi zmdi-shopping-cart"></i>
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="statistic__item">
+                                        <h2 class="number"><?= $products ?></h2>
+                                        <span class="desc">Product</span>
+                                        <div class="icon">
+                                            <i class="zmdi zmdi-shopping-cart"></i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="statistic__item">
-                                    <h2 class="number">$1,060,386</h2>
-                                    <span class="desc">total earnings</span>
-                                    <div class="icon">
-                                        <i class="zmdi zmdi-money"></i>
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="statistic__item">
+                                        <h2 class="number">1000</h2>
+                                        <span class="desc">total earnings</span>
+                                        <div class="icon">
+                                            <i class="zmdi zmdi-money"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            <?php include '../components/footer.php' ?>
+                </section>
+                <?php include '../components/footer.php' ?>
+            </div>
         </div>
-
-    </div>
-
+    <?php } else {
+        header('location:http://localhost/E-commerce/admin/auth/login.php');
+    } ?>
     <!-- Jquery JS-->
     <script src="../resources/vendor/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap JS-->
@@ -131,10 +144,8 @@
     <script src="../resources/vendor/vector-map/jquery.vmap.min.js"></script>
     <script src="../resources/vendor/vector-map/jquery.vmap.sampledata.js"></script>
     <script src="../resources/vendor/vector-map/jquery.vmap.world.js"></script>
-
     <!-- Main JS-->
     <script src="../resources/js/main.js"></script>
-
 </body>
 
 </html>

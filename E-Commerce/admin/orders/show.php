@@ -28,7 +28,6 @@
     <link href="../resources/vendor/select2/select2.min.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/vector-map/jqvmap.min.css" rel="stylesheet" media="all">
-
     <!-- Main CSS-->
     <link href="../resources/css/theme.css" rel="stylesheet" media="all">
 
@@ -40,10 +39,9 @@ include '../core/database.php';
 include '../core/config.php';
 include '../core/MysqlDatabase.php';
 $db = new MysqlDatabase;
-$products = $db->table('products')->getId($_GET['id']);
-$categories = $db->table('categories')->get();
-foreach ($products as $product);
-?>
+$orders = $db->table('orders')->getId($_GET['id']);
+$order_details = $db->table('order_detail')->where(['order_id' => $_GET['id']]);
+foreach ($orders as $order);
 ?>
 
 <body class="animsition">
@@ -64,12 +62,12 @@ foreach ($products as $product);
                                             <span class="au-breadcrumb-span">You are here:</span>
                                             <ul class="list-unstyled list-inline au-breadcrumb__list">
                                                 <li class="list-inline-item active">
-                                                    <a href="index.php">Products</a>
+                                                    <a href="index.php">Orders</a>
                                                 </li>
                                                 <li class="list-inline-item seprate">
                                                     <span>/</span>
                                                 </li>
-                                                <li class="list-inline-item">Edit product</li>
+                                                <li class="list-inline-item">View order details</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -80,65 +78,91 @@ foreach ($products as $product);
                 </section>
                 <div class="card">
                     <div class="card-header">
-                        Add product
+                        <span> View details order: <?= $order->id  ?></span>
+                        <br />
+                        <span>Date: <?= date("d-m-Y", strtotime($order->date)) ?></span>
                     </div>
                     <div class="card-body card-block">
-                        <form action="update.php" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="id" value="<?= $product->id ?>">
-                            <input type="hidden" name="image_path_old" value="<?= $product->image ?>">
+                        <div class="table-responsive" id="order_table">
+                            <table class="table table-bordered table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+
+                                    <?php
+                                    $total_price = 0;
+                                    foreach ($order_details as  $item) {
+                                    ?>
+                                        <tr>
+                                            <td><?= $item->product_name ?></td>
+                                            <td><?= $item->quantity ?></td>
+                                            <td align="right">$<?= $item->price ?></td>
+                                            <td align="right">$<?= $item->price * $item->quantity ?></td>
+                                        </tr>
+                                    <?php
+                                        $total_price += $item->price * $item->quantity;
+                                    } ?>
+                                    <tr>
+                                        <td colspan="3" align="right">Total</td>
+                                        <td align="right">$ <?= $total_price ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <form action="update.php" method="POST">
+                            <input type="hidden" name="id" value="<?= $order->id ?>">
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <label class="control-label mb-1">Payment ID</label>
+                                    <input type="text" disabled name="name" value="<?= $order->payment_id ?>" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="control-label mb-1">Payer ID</label>
+                                    <input type="text" disabled name="name" value="<?= $order->payer_id ?>" class="form-control">
+                                </div>
+                            </div>
                             <div class="row form-group">
                                 <div class="col-6">
                                     <label class="control-label mb-1">Name</label>
-                                    <input type="text" name="name" placeholder="product name... " value="<?= $product->name ?>" class="form-control">
+                                    <input type="text" disabled name="name" value="<?= $order->name ?>" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="control-label mb-1">Phone</label>
+                                    <input type="text" disabled name="name" value="<?= $order->phone ?>" class="form-control">
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-6">
-                                    <label class="control-label mb-1">Price</label>
-                                    <input type="number" value="<?= $product->price ?>" name="price" placeholder="price..." class="form-control">
+                                    <label class="control-label mb-1">Payment Stauts</label>
+                                    <input type="text" disabled name="name" value="<?= $order->payment_status ?>" class="form-control">
                                 </div>
+
                                 <div class="col-6">
-                                    <label class="control-label mb-1">Quantity</label>
-                                    <input type="number" min="1" value="<?= $product->quantity ?>" step="1" name="quantity" placeholder="quantity..." class="form-control">
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-12 col-md-9">
-                                    <label class=" form-control-label">Description</label>
-                                    <textarea name="description" rows="3" placeholder="description..." class="form-control"><?= $product->description ?></textarea>
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-12 col-md-9">
-                                    <label for="select" class=" form-control-label">Category</label>
-                                    <select name="category" id="select" class="form-control">
-                                        <?php
-                                        foreach ($categories as $category) {
-                                        ?>
-                                            <option value="<?php echo $category->id ?>" <?php if ($product->category_id == $category->id) { ?> selected <?php } ?>>
-                                                <?php echo $category->category_name ?>
-                                            </option>
-                                        <?php
-                                        }
-                                        ?>
+                                    <label class="control-label mb-1">Order status</label>
+                                    <select name="order_status" id="select" class="form-control">
+                                        <option value="pending" <?php if ($order->order_status == 'pending') { ?> selected <?php } ?>>Peding</option>
+                                        <option value="processing" <?php if ($order->order_status == 'processing') { ?> selected <?php } ?>>Processing</option>
+                                        <option value="shipping" <?php if ($order->order_status == 'shipping') { ?> selected <?php } ?>>Shipping</option>
+                                        <option value="completed" <?php if ($order->order_status == 'completed') { ?> selected <?php } ?>>Completed</option>
+                                        <option value="decline" <?php if ($order->order_status == 'decline') { ?> selected <?php } ?>>Decline</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-12 col-md-9">
-                                    <label class=" form-control-label">Image</label>
-                                    <div>
-                                        <input type="file" name="image" accept="image/*" onchange="loadFile(event)">
-                                        <img id="output" src="../<?= $product->image ?>" width=" 150" height="150" />
-                                    </div>
+                                    <label class=" form-control-label">Address</label>
+                                    <textarea name="description" disabled rows="3" placeholder="description..." class="form-control"><?= $order->address ?></textarea>
                                 </div>
                             </div>
                             <div class="card-footer text-center">
-                                <button type="submit" class="btn btn-primary btn-sm text-center">Update Product</button>
+                                <button type="submit" class="btn btn-primary btn-sm text-center">Update</button>
                             </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -170,15 +194,6 @@ foreach ($products as $product);
     <script src="../resources/vendor/vector-map/jquery.vmap.sampledata.js"></script>
     <script src="../resources/vendor/vector-map/jquery.vmap.world.js"></script>
     <script src="../resources/js/main.js"></script>
-    <script>
-        var loadFile = function(event) {
-            var output = document.getElementById('output');
-            output.src = URL.createObjectURL(event.target.files[0]);
-            output.onload = function() {
-                URL.revokeObjectURL(output.src) // free memory
-            }
-        };
-    </script>
 </body>
 
 </html>

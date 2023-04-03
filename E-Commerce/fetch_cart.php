@@ -9,7 +9,7 @@ if (isset($_SESSION['shopping_cart'])) {
         <div  class="box form-submit" id="cart_details">
             <input type="hidden" name="cart_id" class="product_id" value="' . $values["product_id"] . '">
             <a href="product.php?id=' . $values["product_id"] . '" class="fas fa-eye"></a>
-            <img src="' . $values["product_image"] . '" alt="">
+            <img src="admin/' . $values["product_image"] . '" alt="">
             <div class="name"> ' . $values["product_name"] . '</div>
             <div class="flex">
                 <div class="price">$' . $values["product_price"] . '/-</div>

@@ -1,5 +1,7 @@
 <?php
 session_start();
-if (isset($_SESSION['shopping_cart'])) {
-    unset($_SESSION['shopping_cart']);
+
+$helper = array_keys($_SESSION);
+foreach ($helper as $key) {
+    unset($_SESSION[$key]);
 }

@@ -57,7 +57,7 @@ $total_price = 0;
 
             $(document).on('change keyup', '#change_quantity', function(e) {
                 e.preventDefault();
-                this.value = this.value.replace(/[^0-9]/g, "");
+                this.value = this.value.replace(/[^0-9]/g, '');
                 var $form = $(this).closest(".form-submit");
                 var product_id = $form.find(".product_id").val();
                 var product_quantity = $form.find(".product_quantity").val();

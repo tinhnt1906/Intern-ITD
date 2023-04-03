@@ -9,7 +9,7 @@ session_start();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>Forgot password</title>
     <!-- font awesome cdn link  -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <!-- custom css file link  -->
@@ -20,6 +20,8 @@ session_start();
 include 'core/database.php';
 include 'core/config.php';
 include 'core/MysqlDatabase.php';
+include 'sendMail.php';
+
 $db = new MysqlDatabase;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //check user already exists
@@ -28,27 +30,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$users) {
         echo ("<script LANGUAGE='JavaScript'>
             window.alert('user not found');
-            window.location.href='login.php';
+            window.location.href='forgot_password.php';
             </script>");
     }
 
-    $checkPassword = password_verify($_POST['password'], $user->password);
-    if (!$checkPassword) {
-        echo ("<script LANGUAGE='JavaScript'>
-            window.alert('password not valid');
-            window.location.href='login.php';
-            </script>");
-    }
-    if (isset($user->verify_token)) {
-        echo "<script type='text/javascript'>alert('Please check email confirm account');</script>";
-    } else {
-        if ($users && $checkPassword) {
-            $_SESSION['user_email'] = $user->email;
-            $_SESSION['user_id'] = $user->id;
-            $_SESSION['user_name'] = $user->username;
-            echo "<script type='text/javascript'>alert('User login ok');</script>";
-        }
-    }
+    $password_reset_token = md5(uniqid(rand(), true));
+    $result = $db->table('users')->update($user->id, ['password_reset_token' => $password_reset_token]);
+
+    $subject = 'Forgot password reset';
+    $resetURL = '<br><br> Bạn đã yêu cầu thay đổi password. Vui lòng click vào đường link sau để thay đổi password <br>
+    <a href="http://localhost/E-commerce/reset_password.php?token=' . $password_reset_token . '">Click me</a>';
+
+    sendMail($_POST['email'], $user->username, $resetURL, $subject);
+    echo "<script type='text/javascript'>alert('check email to recover password');</script>";
 }
 ?>
 
@@ -57,14 +51,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if (empty($_SESSION['user_email'])) { ?>
     <section class="form-container">
         <form action="" method="post" onsubmit="return validateLogin(event);">
-            <h3>login now</h3>
+            <h3>Forgot password</h3>
             <input type="email" id='email' name="email" placeholder="enter your email" maxlength="50" class="box">
-            <input type="password" id='password' name="password" placeholder="enter your password" maxlength="20"
-                class="box">
-            <button class="btn">Login</button>
-            <p>don't have an account?</p>
-            <a href="register.php" class="option-btn">register now</a>
-            <a href="forgot_password.php" class="delete-btn">Forgot password</a>
+            <button class="btn">Submit</button>
         </form>
     </section>
     <?php } else {

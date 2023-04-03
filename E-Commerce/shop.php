@@ -23,41 +23,38 @@ $products = $db->table('products')->get();
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- font awesome cdn link  -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- custom css file link  -->
     <link rel="stylesheet" href="resources/css/style.css">
 
 </head>
 
 <body>
-
     <?php include 'components/header.php'; ?>
-
     <section class="products">
-
         <h1 class="heading">latest products</h1>
-
         <div class="box-container">
-
             <?php
-
             if ($products) {
                 foreach ($products as $product) {
             ?>
-            <form action="" method="post" class="box form-submit">
+            <form action="" class="box form-submit">
                 <input type="hidden" class="product_id" value="<?= $product->id ?>">
                 <input type="hidden" class="product_name" value="<?= $product->name ?>">
                 <input type="hidden" class="product_price" value="<?= $product->price ?>">
                 <input type="hidden" class="product_image" value="<?= $product->image ?>">
-                <a href="product.php?id=<?= $product->id ?>" class="fas fa-eye"></a>
-                <img src="<?= $product->image ?>" alt="">
-                <div class="name"><?= $product->name ?></div>
+                <a href="product.php?id=<?= $product->id ?>"><img src="admin/<?= $product->image ?>" alt=""></a>
+                <a href="product.php?id=<?= $product->id ?>">
+                    <div class="name"><?= $product->name ?></div>
+                </a>
                 <div class="flex">
                     <div class="price"><span>$</span><?= $product->price ?><span>/-</span></div>
-                    <input type="number" name="product_quantity" class="product_quantity" min="1" max="99"
-                        onkeypress="if(this.value.length == 2) return false;" value="1">
+                    <input type="number" oninput="this.value = this.value.replace(/[^0-9]/g, '');" name="quantity"
+                        id="product_quantity" class="product_quantity" min="1" max="99" value="1">
                 </div>
-                <input type="submit" value="add to cart" class="btn add_to_cart" name="add_to_cart">
+                <button value="add to cart" class="btn add_to_cart" name="add_to_cart">Add to
+                    cart</button>
             </form>
             <?php
                 }
@@ -65,18 +62,12 @@ $products = $db->table('products')->get();
                 echo '<p class="empty">no products found!</p>';
             }
             ?>
-
         </div>
-
     </section>
-
-
     <?php include 'components/footer.php'; ?>
-
     <script src="resources/js/script.js"></script>
     <script>
     $(document).ready(function() {
-
         function load_cart_item_number() {
             $.ajax({
                 url: "action.php",

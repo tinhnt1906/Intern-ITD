@@ -54,16 +54,12 @@ $order_details .= '</table>';
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>home</title>
-
     <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
     <!-- link ajax -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"
         integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-
-    <!-- font awesome cdn link  -->
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
     <!-- custom css file link  -->
@@ -83,49 +79,37 @@ $order_details .= '</table>';
 
 <body>
     <?php
-
-    
     ?>
-
     <?php include 'components/header.php' ?>
     <?php
     if (isset($_SESSION['user_email']) && $_SESSION['shopping_cart']) {
     ?>
     <div class="container">
-
-        <br />
-        <h3 align="center"><a href="#">Shopping Cart</a></h3>
-        <br />
         <span id="message"></span>
         <div class="panel panel-default">
-            <div class="panel-heading">Order Process</div>
             <div class="panel-body">
-                <form method="post" id="order_process_form" action="process_checkout.php">
+                <form method="post" action="process_checkout.php">
                     <div class="row">
                         <div class="col-md-7" style="border-right:1px solid #ddd;">
-                            <h4 align="center">Customer Details</h4>
+                            <h4 align="center">consignee details</h4>
                             <div class="form-group">
-                                <label><b>Card Holder Name <span class="text-danger">*</span></b></label>
-                                <input type="text" name="customer_name" id="customer_name" class="form-control"
+                                <label><b>Name <span class="text-danger">*</span></b></label>
+                                <input type="text" name="name" id="customer_name" required class="form-control"
                                     value="" />
-                                <span id="error_customer_name" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label><b>Email Address <span class="text-danger">*</span></b></label>
-                                <input type="text" name="email_address" id="email_address" class="form-control"
+                                <label><b>Number Phone<span class="text-danger">*</span></b></label>
+                                <input type="text" name="phone" id="email_address" required class="form-control"
                                     value="" />
-                                <span id="error_email_address" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label><b>Address <span class="text-danger">*</span></b></label>
-                                <textarea name="customer_address" id="customer_address" class="form-control"></textarea>
-                                <span id="error_customer_address" class="text-danger"></span>
+                                <textarea name="address" id="customer_address" required class="form-control"></textarea>
                             </div>
 
                             <br />
                             <div align="center">
                                 <input type="hidden" name="total_price" value="<?php echo $total_price; ?>" />
-
                                 <input type="submit" name="button_action" id="button_action"
                                     class="btn btn-success btn-sm" value="Pay Now" />
                             </div>

@@ -35,6 +35,8 @@
 </head>
 
 <?php
+session_start();
+
 include '../core/database.php';
 include '../core/config.php';
 include '../core/MysqlDatabase.php';
@@ -43,91 +45,97 @@ $categories = $db->table('categories')->get();
 ?>
 
 <body class="animsition">
-    <div class="page-wrapper">
-        <?php include '../components/sidebar.php' ?>
-        <div class="page-container2">
-            <?php include '../components/header.php' ?>
-            <section class="au-breadcrumb m-t-75">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="au-breadcrumb-content">
-                                    <div class="au-breadcrumb-left">
-                                        <span class="au-breadcrumb-span">You are here:</span>
-                                        <ul class="list-unstyled list-inline au-breadcrumb__list">
-                                            <li class="list-inline-item active">
-                                                <a href="index.php">Products</a>
-                                            </li>
-                                            <li class="list-inline-item seprate">
-                                                <span>/</span>
-                                            </li>
-                                            <li class="list-inline-item">Create product</li>
-                                        </ul>
+    <?php
+    if (isset($_SESSION['user_email_admin']) && $_SESSION['user_role_admin'] == 'admin') {
+    ?>
+        <div class="page-wrapper">
+            <?php include '../components/sidebar.php' ?>
+            <div class="page-container2">
+                <?php include '../components/header.php' ?>
+                <section class="au-breadcrumb m-t-75">
+                    <div class="section__content section__content--p30">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="au-breadcrumb-content">
+                                        <div class="au-breadcrumb-left">
+                                            <span class="au-breadcrumb-span">You are here:</span>
+                                            <ul class="list-unstyled list-inline au-breadcrumb__list">
+                                                <li class="list-inline-item active">
+                                                    <a href="index.php">Products</a>
+                                                </li>
+                                                <li class="list-inline-item seprate">
+                                                    <span>/</span>
+                                                </li>
+                                                <li class="list-inline-item">Create product</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            <div class="card">
-                <div class="card-header">
-                    Add product
-                </div>
-                <div class="card-body card-block">
-                    <form action="store.php" method="POST" enctype="multipart/form-data">
-                        <div class="row form-group">
-                            <div class="col-6">
-                                <label class="control-label mb-1">Name</label>
-                                <input type="text" name="name" placeholder="product name... " class="form-control">
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-6">
-                                <label class="control-label mb-1">Price</label>
-                                <input type="number" name="price" placeholder="price..." class="form-control">
-                            </div>
-                            <div class="col-6">
-                                <label class="control-label mb-1">Quantity</label>
-                                <input type="number" min="1" step="1" name="quantity" placeholder="quantity..." class="form-control">
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-12 col-md-9">
-                                <label class=" form-control-label">Description</label>
-                                <textarea name="description" rows="3" placeholder="description..." class="form-control"></textarea>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-12 col-md-9">
-                                <label for="select" class=" form-control-label">Category</label>
-                                <select name="category" id="select" class="form-control">
-                                    <option value="0">Please select category</option>
-                                    <?php foreach ($categories as $category) { ?>
-                                        <option value="<?= $category->id ?>"><?= $category->category_name ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-12 col-md-9">
-                                <label class=" form-control-label">Image</label>
-                                <div>
-                                    <input type="file" name="image" required="true" accept="image/*" onchange="loadFile(event)">
-                                    <img id="output" width="150" height="150" />
+                </section>
+                <div class="card">
+                    <div class="card-header">
+                        Add product
+                    </div>
+                    <div class="card-body card-block">
+                        <form action="store.php" method="POST" enctype="multipart/form-data">
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <label class="control-label mb-1">Name</label>
+                                    <input type="text" name="name" placeholder="product name... " class="form-control">
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-footer text-center">
-                            <button type="submit" class="btn btn-primary btn-sm text-center">Add Product</button>
-                        </div>
-                    </form>
-                </div>
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <label class="control-label mb-1">Price</label>
+                                    <input type="number" name="price" placeholder="price..." class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="control-label mb-1">Quantity</label>
+                                    <input type="number" min="1" step="1" name="quantity" placeholder="quantity..." class="form-control">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-12 col-md-9">
+                                    <label class=" form-control-label">Description</label>
+                                    <textarea name="description" rows="3" placeholder="description..." class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-12 col-md-9">
+                                    <label for="select" class=" form-control-label">Category</label>
+                                    <select name="category" id="select" class="form-control">
+                                        <option value="0">Please select category</option>
+                                        <?php foreach ($categories as $category) { ?>
+                                            <option value="<?= $category->id ?>"><?= $category->category_name ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-12 col-md-9">
+                                    <label class=" form-control-label">Image</label>
+                                    <div>
+                                        <input type="file" name="image" required="true" accept="image/*" onchange="loadFile(event)">
+                                        <img id="output" width="150" height="150" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer text-center">
+                                <button type="submit" class="btn btn-primary btn-sm text-center">Add Product</button>
+                            </div>
+                        </form>
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
+    <?php } else {
+        header('location:http://localhost/E-commerce/admin/auth/login.php');
+    } ?>
     <!-- Jquery JS-->
     <script src="../resources/vendor/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap JS-->

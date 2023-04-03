@@ -1,3 +1,6 @@
+<?php
+?>
+
 <aside class="menu-sidebar2">
     <div class="logo">
         <a href="#">
@@ -9,8 +12,10 @@
             <div class="image img-cir img-120">
                 <img src="../resources/images/icon/avatar-big-01.jpg" alt="John Doe" />
             </div>
-            <h4 class="name">john doe</h4>
-            <a href="#">Sign out</a>
+            <span class="name">
+                <?= $_SESSION['user_email_admin'] ?>
+            </span>
+            <a href="../auth/logout.php">Sign out</a>
         </div>
         <nav class="navbar-sidebar2">
             <ul class="list-unstyled navbar__list">

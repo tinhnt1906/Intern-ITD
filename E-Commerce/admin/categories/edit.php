@@ -21,8 +21,7 @@
 
     <!-- Vendor CSS-->
     <link href="../resources/vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
-    <link href="../resources/vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet"
-        media="all">
+    <link href="../resources/vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/wow/animate.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/slick/slick.css" rel="stylesheet" media="all">
@@ -36,6 +35,7 @@
 </head>
 
 <?php
+session_start();
 include '../core/database.php';
 include '../core/config.php';
 include '../core/MysqlDatabase.php';
@@ -45,61 +45,65 @@ foreach ($categories as $category);
 ?>
 
 <body class="animsition">
-    <div class="page-wrapper">
-        <?php include '../components/sidebar.php' ?>
-        <div class="page-container2">
-            <?php include '../components/header.php' ?>
-            <section class="au-breadcrumb m-t-75">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="au-breadcrumb-content">
-                                    <div class="au-breadcrumb-left">
-                                        <span class="au-breadcrumb-span">You are here:</span>
-                                        <ul class="list-unstyled list-inline au-breadcrumb__list">
-                                            <li class="list-inline-item active">
-                                                <a href="index.php">Caterories</a>
-                                            </li>
-                                            <li class="list-inline-item seprate">
-                                                <span>/</span>
-                                            </li>
-                                            <li class="list-inline-item">Edit category</li>
-                                        </ul>
+    <?php
+    if (isset($_SESSION['user_email_admin']) && $_SESSION['user_role_admin'] == 'admin') {
+    ?>
+        <div class="page-wrapper">
+            <?php include '../components/sidebar.php' ?>
+            <div class="page-container2">
+                <?php include '../components/header.php' ?>
+                <section class="au-breadcrumb m-t-75">
+                    <div class="section__content section__content--p30">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="au-breadcrumb-content">
+                                        <div class="au-breadcrumb-left">
+                                            <span class="au-breadcrumb-span">You are here:</span>
+                                            <ul class="list-unstyled list-inline au-breadcrumb__list">
+                                                <li class="list-inline-item active">
+                                                    <a href="index.php">Caterories</a>
+                                                </li>
+                                                <li class="list-inline-item seprate">
+                                                    <span>/</span>
+                                                </li>
+                                                <li class="list-inline-item">Edit category</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h3 class="text-center title-2">Edit Category</h3>
-                    </div>
-                    <form action="update.php" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="id" value="<?= $category->id ?>">
-                        <input type="hidden" name="image_path_old" value="<?= $category->category_image ?>">
-                        <div class="form-group">
-                            <label for="cc-payment" class="control-label mb-1">Name</label>
-                            <input id="cc-pament" name="name" type="text" class="form-control"
-                                value="<?= $category->category_name ?>">
+                </section>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h3 class="text-center title-2">Edit Category</h3>
                         </div>
+                        <form action="update.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id" value="<?= $category->id ?>">
+                            <input type="hidden" name="image_path_old" value="<?= $category->category_image ?>">
+                            <div class="form-group">
+                                <label for="cc-payment" class="control-label mb-1">Name</label>
+                                <input id="cc-pament" name="name" type="text" class="form-control" value="<?= $category->category_name ?>">
+                            </div>
 
-                        <input type="file" name="image" accept="image/*" onchange="loadFile(event)">
-                        <img id="output" width="150" height="150" src="../<?= $category->category_image ?>" />
-                        <div>
-                            <button type="submit" class="btn btn-primary btn-sm center">
-                                Edit Category
-                            </button>
-                        </div>
-                    </form>
+                            <input type="file" name="image" accept="image/*" onchange="loadFile(event)">
+                            <img id="output" width="150" height="150" src="../<?= $category->category_image ?>" />
+                            <div>
+                                <button type="submit" class="btn btn-primary btn-sm center">
+                                    Edit Category
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-
-    </div>
+    <?php } else {
+        header('location:http://localhost/E-commerce/admin/auth/login.php');
+    } ?>
     <!-- Jquery JS-->
     <script src="../resources/vendor/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap JS-->
@@ -126,13 +130,13 @@ foreach ($categories as $category);
     <script src="../resources/vendor/vector-map/jquery.vmap.world.js"></script>
     <script src="../resources/js/main.js"></script>
     <script>
-    var loadFile = function(event) {
-        var output = document.getElementById('output');
-        output.src = URL.createObjectURL(event.target.files[0]);
-        output.onload = function() {
-            URL.revokeObjectURL(output.src) // free memory
-        }
-    };
+        var loadFile = function(event) {
+            var output = document.getElementById('output');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.onload = function() {
+                URL.revokeObjectURL(output.src) // free memory
+            }
+        };
     </script>
 </body>
 

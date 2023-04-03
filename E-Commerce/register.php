@@ -19,6 +19,7 @@
 include 'core/database.php';
 include 'core/config.php';
 include 'core/MysqlDatabase.php';
+include 'sendMail.php';
 $db = new MysqlDatabase;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $checkEmail = $db->table('users')->where(['email' => $_POST['email']]);
@@ -28,13 +29,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else if ($checkPhone) {
         echo "<script type='text/javascript'>alert('Number phone already exists');</script>";
     } else {
+        $verify_token = md5(uniqid(rand(), true));
         $db->table('users')->create([
             'username' => $_POST['username'],
             'phone' => $_POST['phone'],
             'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
             'email' => $_POST['email'],
+            'verify_token' => $verify_token
         ]);
-        echo "<script type='text/javascript'>alert('register successfully. please login');</script>";
+        $subject = 'Regiser account comfirmation';
+        $resetURL = '<br><br> Bạn đã đăng ký tài khoản thành công. Vui lòng click vào đường link sau để xác nhận tài khoản <br>
+        <a href="http://localhost/E-commerce/verify-email.php?token=' . $verify_token . '">Click me</a>';
+        sendMail($_POST['email'], $_POST['username'], $resetURL, $subject);
+        echo "<script type='text/javascript'>alert('register successfully. please check email comfirm');</script>";
     }
 }
 ?>
@@ -49,7 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="text" id="phone" name="phone" placeholder="enter your phone" class="box">
             <input type="email" id="email" name="email" placeholder="enter your email" maxlength="50" class="box">
             <input type="password" id="password" name="password" placeholder="enter your password" class="box">
-            <input type="password" id="confirm_password" name="confirm_password" placeholder="confirm your password" class="box">
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="confirm your password"
+                class="box">
             <button class="btn">Register</button>
             <p>already have an account?</p>
             <a href="login.php" class="option-btn">login now</a>
@@ -60,9 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="script.js"></script>
     <script src="resources/js/script.js"></script>
     <script>
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
-        }
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
     </script>
 </body>
 

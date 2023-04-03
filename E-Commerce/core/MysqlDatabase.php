@@ -1,7 +1,7 @@
 <?php
 class MysqlDatabase extends database
 {
-    protected $connect;
+    public $connect;
 
     public function __construct()
     {
@@ -27,7 +27,7 @@ class MysqlDatabase extends database
 
     public function get($limit = 10)
     {
-        $sql = "SELECT * FROM $this->table limit ?";
+        $sql = "SELECT * FROM $this->table ORDER BY id desc limit ?";
         $query = $this->connect->prepare($sql);
         $query->bind_param('i', $limit);
         $query->execute();
@@ -38,27 +38,6 @@ class MysqlDatabase extends database
         }
         return $data;
     }
-
-    // public function whereAND($data)
-    // {
-    //     $keyValues = [];
-    //     foreach ($data as $key => $value) {
-    //         $keyValues[] = $key . '=?';
-    //     }
-    //     $setFields = implode(' AND ', $keyValues);
-    //     $sql = "SELECT * FROM $this->table where $setFields";
-    //     echo $sql;
-    //     $values = array_values($data);
-    //     $query = $this->connect->prepare($sql);
-    //     $query->bind_param(str_repeat('s', count($data)), ...$values);
-    //     $query->execute();
-    //     $result = $query->get_result();
-    //     $data = [];
-    //     while ($each = $result->fetch_object()) {
-    //         $data[] = $each;
-    //     }
-    //     return $data;
-    // }
 
     public function where($data)
     {
@@ -90,25 +69,6 @@ class MysqlDatabase extends database
         return $rows;
     }
 
-    // public function whereOR($data)
-    // {
-    //     $keyValues = [];
-    //     foreach ($data as $key => $value) {
-    //         $keyValues[] = $key . '=?';
-    //     }
-    //     $setFields = implode(' OR ', $keyValues);
-    //     $sql = "SELECT * FROM $this->table where $setFields";
-    //     $values = array_values($data);
-    //     $query = $this->connect->prepare($sql);
-    //     $query->bind_param(str_repeat('s', count($data)), ...$values);
-    //     $query->execute();
-    //     $result = $query->get_result();
-    //     $data = [];
-    //     while ($each = $result->fetch_object()) {
-    //         $data[] = $each;
-    //     }
-    //     return $data;
-    // }
 
     public function getId($id)
     {
@@ -150,6 +110,24 @@ class MysqlDatabase extends database
         $values = array_values($data);
         $values[] = $id;
         $query->bind_param(str_repeat("s", count($data)) . 'i', ...$values);
+        $result = $query->execute();
+        return $query->affected_rows;
+    }
+
+    public function updateToken($id, $data)
+    {
+        $keyValues = [];
+        foreach ($data as $key => $value) {
+            $keyValues[] = $key . '=?';
+        }
+        $setFields = implode(',', $keyValues);
+
+        $sql = "Update $this->table set $setFields where verify_token = ?";
+        $query = $this->connect->prepare($sql);
+        //get values
+        $values = array_values($data);
+        $values[] = $id;
+        $query->bind_param(str_repeat("s", count($data)) . 's', ...$values);
         $result = $query->execute();
         return $query->affected_rows;
     }

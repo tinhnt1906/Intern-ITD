@@ -36,6 +36,7 @@
 </head>
 
 <?php
+session_start();
 include '../core/database.php';
 include '../core/config.php';
 include '../core/MysqlDatabase.php';
@@ -44,86 +45,90 @@ $categories = $db->table('categories')->get();
 ?>
 
 <body class="animsition">
-    <div class="page-wrapper">
-
-        <?php include '../components/sidebar.php' ?>
-        <div class="page-container2">
-            <?php include '../components/header.php' ?>
-            <section class="au-breadcrumb m-t-75">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="au-breadcrumb-content">
-                                    <div class="au-breadcrumb-left">
-                                        <span class="au-breadcrumb-span">You are here:</span>
-                                        <ul class="list-unstyled list-inline au-breadcrumb__list">
-                                            <li class="list-inline-item active">
-                                                <a href="#">Home</a>
-                                            </li>
-                                            <li class="list-inline-item seprate">
-                                                <span>/</span>
-                                            </li>
-                                            <li class="list-inline-item">Categories</li>
-                                        </ul>
+    <?php
+    if (isset($_SESSION['user_email_admin']) && $_SESSION['user_role_admin'] == 'admin') {
+    ?>
+        <div class="page-wrapper">
+            <?php include '../components/sidebar.php' ?>
+            <div class="page-container2">
+                <?php include '../components/header.php' ?>
+                <section class="au-breadcrumb m-t-75">
+                    <div class="section__content section__content--p30">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="au-breadcrumb-content">
+                                        <div class="au-breadcrumb-left">
+                                            <span class="au-breadcrumb-span">You are here:</span>
+                                            <ul class="list-unstyled list-inline au-breadcrumb__list">
+                                                <li class="list-inline-item active">
+                                                    <a href="#">Home</a>
+                                                </li>
+                                                <li class="list-inline-item seprate">
+                                                    <span>/</span>
+                                                </li>
+                                                <li class="list-inline-item">Categories</li>
+                                            </ul>
+                                        </div>
+                                        <a href="create.php" class="au-btn au-btn-icon au-btn--green">
+                                            <i class="zmdi zmdi-plus"></i>add Category</a>
                                     </div>
-                                    <a href="create.php" class="au-btn au-btn-icon au-btn--green">
-                                        <i class="zmdi zmdi-plus"></i>add Category</a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            <div class="section__content section__content--p30">
-                <div class="container-fluid">
-                    <div class="row m-t-30">
-                        <div class="col-md-12">
-                            <!-- DATA TABLE-->
-                            <div class="table-responsive m-b-40">
-                                <table class="table table-borderless table-data3">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Name</th>
-                                            <th>Image</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                </section>
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row m-t-30">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE-->
+                                <div class="table-responsive m-b-40">
+                                    <table class="table table-borderless table-data3">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Name</th>
+                                                <th>Image</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
 
-                                        <?php if ($categories) {
-                                            foreach ($categories as  $category) {
-                                        ?>
-                                                <tr>
-                                                    <td><?= $category->id ?></td>
-                                                    <td><?= $category->category_name ?></td>
-                                                    <td><img src="../<?= $category->category_image ?>" height="100" width="100" /></td>
-                                                    <td class="process">
-                                                        <a href="edit.php?id=<?= $category->id ?>">Edit</a>
-                                                        <a href="delete.php?id=<?= $category->id ?>">Delete</a>
-                                                    </td>
-                                                </tr>
-                                        <?php
+                                            <?php if ($categories) {
+                                                foreach ($categories as  $category) {
+                                            ?>
+                                                    <tr>
+                                                        <td><?= $category->id ?></td>
+                                                        <td><?= $category->category_name ?></td>
+                                                        <td><img src="../<?= $category->category_image ?>" height="100" width="100" /></td>
+                                                        <td class="process">
+                                                            <a href="edit.php?id=<?= $category->id ?>">Edit</a>
+                                                            <a href="delete.php?id=<?= $category->id ?>">Delete</a>
+                                                        </td>
+                                                    </tr>
+                                            <?php
+                                                }
+                                            } else {
+                                                echo 'not found';
                                             }
-                                        } else {
-                                            echo 'not found';
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- END DATA TABLE-->
                             </div>
-                            <!-- END DATA TABLE-->
                         </div>
                     </div>
                 </div>
+                <!-- END STATISTIC-->
+
             </div>
-            <!-- END STATISTIC-->
 
         </div>
-
-    </div>
-
+    <?php } else {
+        header('location:http://localhost/E-commerce/admin/auth/login.php');
+    } ?>
     <!-- Jquery JS-->
     <script src="../resources/vendor/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap JS-->

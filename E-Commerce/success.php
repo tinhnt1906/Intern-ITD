@@ -4,7 +4,7 @@ include 'core/database.php';
 include 'core/config.php';
 include 'core/MysqlDatabase.php';
 $db = new MysqlDatabase;
-$order_id = md5(uniqid(rand(), true));
+$order_id = uniqid();
 if (array_key_exists('paymentId', $_GET) && array_key_exists('PayerID', $_GET)) {
     $transaction = $gateway->completePurchase(array(
         'payer_id'             => $_GET['PayerID'],
@@ -14,8 +14,6 @@ if (array_key_exists('paymentId', $_GET) && array_key_exists('PayerID', $_GET)) 
 
     if ($response->isSuccessful()) {
         $arr_body = $response->getData();
-        die(print_r($arr_body));
-
         $payment_id = $arr_body['id'];
         $payer_id = $arr_body['payer']['payer_info']['payer_id'];
         $payer_email = $arr_body['payer']['payer_info']['email'];
@@ -27,7 +25,9 @@ if (array_key_exists('paymentId', $_GET) && array_key_exists('PayerID', $_GET)) 
             'payment_id' => $payment_id,
             'payer_id' => $payer_id,
             'user_id' => $_SESSION['user_id'],
-            'email' =>  $payer_email,
+            'phone' =>  $_SESSION['receiver_infor']['phone'],
+            'name' =>  $_SESSION['receiver_infor']['name'],
+            'address' =>  $_SESSION['receiver_infor']['address'],
             'total_price' => $amount,
             'currency' =>  PAYPAL_CURRENCY,
             'payment_status' => $payment_status,
@@ -38,16 +38,20 @@ if (array_key_exists('paymentId', $_GET) && array_key_exists('PayerID', $_GET)) 
             $db->table('order_detail')->create([
                 'order_id' => $order_id,
                 'product_id' => $values["product_id"],
+                'product_name' => $values["product_name"],
+                'product_image' => $values["product_image"],
                 'quantity' => $values["product_quantity"],
-                'price' => $values["product_price"]
+                'price' => $values["product_price"],
             ]);
 
             $products =   $db->table('products')->where(['id' => $values["product_id"]]);
             foreach ($products as $product);
             $db->table('products')->update($values["product_id"], ['quantity' => $product->quantity - $values["product_quantity"]]);
             unset($_SESSION['shopping_cart']);
+            unset($_SESSION['receiver_infor']);
         }
         echo "Payment is successful. Your transaction id is: " . $payment_id;
+        echo '<a href="order.php">go my orders</a>';
     } else {
         echo $response->getMessage();
     }

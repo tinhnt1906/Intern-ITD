@@ -1,10 +1,9 @@
 <?php
+session_start();
 include 'core/database.php';
 include 'core/config.php';
 include 'core/MysqlDatabase.php';
 $db = new MysqlDatabase;
-$products = $db->table('products')->where(['id' => $_GET['id']]);
-
 ?>
 
 <!DOCTYPE html>
@@ -14,73 +13,62 @@ $products = $db->table('products')->where(['id' => $_GET['id']]);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product detail</title>
+    <title>category</title>
     <!-- link ajax -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- font awesome cdn link  -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
     <!-- custom css file link  -->
     <link rel="stylesheet" href="resources/css/style.css">
 
 </head>
 
 <body>
-
     <?php include 'components/header.php'; ?>
-
-    <section class="quick-view">
-
-        <h1 class="heading">quick view</h1>
-
-        <?php
-        if ($products) {
-            foreach ($products as $product) {
-        ?>
-                <form action="" method="post" class="box form-submit">
-                    <input type="hidden" class="product_id" value="<?= $product->id ?>">
-                    <input type="hidden" class="product_name" value="<?= $product->name ?>">
-                    <input type="hidden" class="product_price" value="<?= $product->price ?>">
-                    <input type="hidden" class="product_image" value="<?= $product->image ?>">
-                    <div class="row">
-                        <div class="image-container">
-                            <div class="main-image">
-                                <img src="admin/<?= $product->image ?>" alt="">
-                            </div>
-                            <div class="sub-image">
-                                <img src="admin/<?= $product->image ?> ?>" alt="">
-                                <img src="admin/<?= $product->image ?> ?>" alt="">
-                                <img src="admin/<?= $product->image ?> ?>" alt="">
-                            </div>
-                        </div>
-                        <div class="content">
-                            <div class="name"><?= $product->name ?>
-                                <?php if ($product->quantity < 1) { ?>
-                                    <span class="text-danger">out stock</span>
-                                <?php } ?>
-                            </div>
-                            <div class="flex">
-                                <div class="price"><span>$</span><?= $product->price ?><span>/-</span></div>
-                                <input type="number" name="product_quantity" class="product_quantity" min="1" max="99" onkeypress="if(this.value.length == 2) return false;" value="1">
-                            </div>
-                            <div class="description"><?= $product->description  ?></div>
-                            <div class="flex-btn">
-                                <input type="submit" <?php if ($product->quantity < 1) { ?> disabled <?php } ?>value="add to cart" class="btn add_to_cart" name="add_to_cart">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-        <?php
-            }
-        } else {
-            echo '<p class="empty">Products not found!</p>';
-        }
-        ?>
-
+    <section class="search-form">
+        <form action="" method="post">
+            <input type="text" name="search_box" placeholder="search product here..." maxlength="100" class="box" required>
+            <button type="submit" class="fas fa-search" name="search_btn"></button>
+        </form>
     </section>
 
-    <?php include 'components/footer.php'; ?>
+    <section class="products" style="padding-top: 0; min-height:100vh;">
+        <div class="box-container">
+            <?php
+            if (isset($_POST['search_box']) || isset($_POST['search_btn'])) {
+                $search_box = $_POST['search_box'];
+                $sql = " SELECT * FROM `products` WHERE name LIKE '%{$search_box}%'";
+                $result = $db->connect->query($sql);
+                $rowcount = mysqli_num_rows($result);
+                if ($rowcount > 0) {
+                    while ($product = $result->fetch_object()) {
+            ?>
+                        <form action="" method="post" class="box form-submit">
+                            <input type="hidden" class="product_id" value="<?= $product->id ?>">
+                            <input type="hidden" class="product_name" value="<?= $product->name ?>">
+                            <input type="hidden" class="product_price" value="<?= $product->price ?>">
+                            <input type="hidden" class="product_image" value="<?= $product->image ?>">
+                            <a href="product.php?id=<?= $product->id ?>" class="fas fa-eye"></a>
+                            <img src="admin/<?= $product->image ?>" alt="">
+                            <div class="name"><?= $product->name ?></div>
+                            <div class="flex">
+                                <div class="price"><span>$</span><?= $product->price ?><span>/-</span></div>
+                                <input type="number" name="product_quantity" class="product_quantity" min="1" max="5" oninput="this.value = this.value.replace(/[^0-9]/g, '');" value="1">
+                            </div>
+                            <input type="submit" value="add to cart" class="btn add_to_cart" name="add_to_cart">
+                        </form>
+            <?php
+                    }
+                } else {
+                    echo '<p class="empty">no products found!</p>';
+                }
+            }
+            ?>
+        </div>
 
+    </section>
+    <?php include 'components/footer.php'; ?>
     <script src="resources/js/script.js"></script>
     <script>
         $(document).ready(function() {
@@ -107,11 +95,6 @@ $products = $db->table('products')->where(['id' => $_GET['id']]);
                 var product_quantity = $form.find(".product_quantity").val();
                 var product_image = $form.find(".product_image").val();
                 var action = "add_to_cart";
-                var stock_quantity = <?php echo json_encode($product->quantity); ?>;
-                if (product_quantity > stock_quantity) {
-                    alert('Quantity is not enough, please contact us for support');
-                    return;
-                }
                 $.ajax({
                     url: "action.php",
                     method: "post",

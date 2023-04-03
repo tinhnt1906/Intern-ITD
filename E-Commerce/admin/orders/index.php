@@ -9,7 +9,6 @@
     <meta name="keywords" content="au theme template">
     <!-- Title Page-->
     <title>Dashboard 2</title>
-
     <!-- Fontfaces CSS-->
     <link href="../resources/css/font-face.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
@@ -26,8 +25,6 @@
     <link href="../resources/vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
     <link href="../resources/vendor/vector-map/jqvmap.min.css" rel="stylesheet" media="all">
     <link href="../resources/css/theme.css" rel="stylesheet" media="all">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 
 <?php
@@ -36,12 +33,7 @@ include '../core/database.php';
 include '../core/config.php';
 include '../core/MysqlDatabase.php';
 $db = new MysqlDatabase;
-$sql = " select p.*, c.category_name from products p, categories c where  p.category_id = c.id";
-$result = $db->connect->query($sql);
-while ($each = $result->fetch_object()) {
-    $products[] = $each;
-}
-
+$orders = $db->table('orders')->get();
 ?>
 
 <body class="animsition">
@@ -62,16 +54,14 @@ while ($each = $result->fetch_object()) {
                                         <span class="au-breadcrumb-span">You are here:</span>
                                         <ul class="list-unstyled list-inline au-breadcrumb__list">
                                             <li class="list-inline-item active">
-                                                <a href="index.php">Home</a>
+                                                <a href="#">Home</a>
                                             </li>
                                             <li class="list-inline-item seprate">
                                                 <span>/</span>
                                             </li>
-                                            <li class="list-inline-item"> <a href="index.php">Products</a></li>
+                                            <li class="list-inline-item"><a href="index.php">Order</a></li>
                                         </ul>
                                     </div>
-                                    <a href="create.php" class="au-btn au-btn-icon au-btn--green">
-                                        <i class="zmdi zmdi-plus"></i>add product</a>
                                 </div>
                             </div>
                         </div>
@@ -84,7 +74,7 @@ while ($each = $result->fetch_object()) {
                         <div class="col-md-12">
                             <form action="" method="post">
                                 <input name="search_box" class="au-input au-input--full au-input--h55" type="text"
-                                    placeholder="Search for product name" />
+                                    placeholder="Search for order id " />
                             </form>
                         </div>
                         <div class="col-md-12 mt-2">
@@ -95,29 +85,28 @@ while ($each = $result->fetch_object()) {
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Date</th>
                                             <th>Name</th>
-                                            <th>Price</th>
-                                            <th>Quantity</th>
-                                            <th>Category</th>
-                                            <th>Image</th>
+                                            <th>Total</th>
+                                            <th>Payment status</th>
+                                            <th>Order status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 
-                                        <?php if ($result) {
-                                                    foreach ($products as  $product) {
+                                        <?php if ($orders) {
+                                                    foreach ($orders as  $order) {
                                                 ?>
                                         <tr>
-                                            <td><?= $product->id ?></td>
-                                            <td><?= $product->name ?></td>
-                                            <td><?= $product->price ?></td>
-                                            <td><?= $product->quantity ?></td>
-                                            <td><?= $product->category_name ?></td>
-                                            <td><img src="../<?= $product->image ?>" height="50" width="50" /></td>
+                                            <td><?= $order->id ?></td>
+                                            <td><?= date("d-m-Y", strtotime($order->date));  ?></td>
+                                            <td><?= $order->name ?></td>
+                                            <td><?= $order->total_price . ' ' . $order->currency ?></td>
+                                            <td><?= $order->payment_status ?></td>
+                                            <td><?= $order->order_status ?></td>
                                             <td class="process">
-                                                <a href="edit.php?id=<?= $product->id ?>">Edit</a>
-                                                <a href="delete.php?id=<?= $product->id ?>">Delete</a>
+                                                <a href="show.php?id=<?= $order->id ?>">Show Detail</a>
                                             </td>
                                         </tr>
                                         <?php
@@ -130,16 +119,17 @@ while ($each = $result->fetch_object()) {
                                 </table>
                             </div>
                             <?php } else { ?>
+                            <!-- DATA SEARCH -->
                             <div class="table-responsive m-b-40">
                                 <table class="table table-borderless table-data3">
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Date</th>
                                             <th>Name</th>
-                                            <th>Price</th>
-                                            <th>Quantity</th>
-                                            <th>Category</th>
-                                            <th>Image</th>
+                                            <th>Total</th>
+                                            <th>Payment status</th>
+                                            <th>Order status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -147,23 +137,22 @@ while ($each = $result->fetch_object()) {
                                         <?php
                                                 if (isset($_POST['search_box'])) {
                                                     $search_box = $_POST['search_box'];
-                                                    $sql = " SELECT * FROM `products` WHERE name LIKE '%{$search_box}%'";
+                                                    $sql = " SELECT * FROM `orders` WHERE id LIKE '%{$search_box}%'";
                                                     $result = $db->connect->query($sql);
                                                     $rowcount = mysqli_num_rows($result);
-                                                    unset($_POST['search_box']);
+                                                    $_POST['search_box'] =  null;
                                                     if ($rowcount > 0) {
-                                                        while ($product = $result->fetch_object()) {
+                                                        while ($order = $result->fetch_object()) {
                                                 ?>
                                         <tr>
-                                            <td><?= $product->id ?></td>
-                                            <td><?= $product->name ?></td>
-                                            <td><?= $product->price ?></td>
-                                            <td><?= $product->quantity ?></td>
-                                            <td><?= $product->category_id ?></td>
-                                            <td><img src="../<?= $product->image ?>" height="50" width="50" /></td>
+                                            <td><?= $order->id ?></td>
+                                            <td><?= date("d-m-Y", strtotime($order->date));  ?></td>
+                                            <td><?= $order->name ?></td>
+                                            <td><?= $order->total_price . ' ' . $order->currency ?></td>
+                                            <td><?= $order->payment_status ?></td>
+                                            <td><?= $order->order_status ?></td>
                                             <td class="process">
-                                                <a href="edit.php?id=<?= $product->id ?>">Edit</a>
-                                                <a href="delete.php?id=<?= $product->id ?>">Delete</a>
+                                                <a href="show.php?id=<?= $order->id ?>">Show Detail</a>
                                             </td>
                                         </tr>
                                         <?php
